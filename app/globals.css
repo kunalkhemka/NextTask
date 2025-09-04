@@ -129,7 +129,13 @@
 }
 
 .dotted-bg {
-  background-image: radial-gradient(currentColor 1px, transparent 1px);
+  background-image: radial-gradient(var(--ring) 1px, transparent 1px);
   background-size: 30px 30px;
   background-position: center;
+}
+
+.wmde-markdown ul {
+  list-style-type: disc;
+  padding-left: 15px !important;
+  color: white;
 }
