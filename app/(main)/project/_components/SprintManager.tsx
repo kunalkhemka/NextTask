@@ -92,7 +92,7 @@ const SprintManager = ({ sprint, setSprint, sprints, projectId }: params) => {
           <SelectTrigger
             className={`w-[250px] sm:w-[370px] data-[size=default]:h-12 sm:data-[size=default]:h-9`}
           >
-            <SelectValue placeholder="Select Sprint" />
+            <SelectValue placeholder="Select Sprint" className="bg-white" />
           </SelectTrigger>
           <SelectContent>
             {sprints.map((sprint) => {

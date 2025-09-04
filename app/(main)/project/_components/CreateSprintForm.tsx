@@ -90,19 +90,20 @@ const CreateSprintForm = ({
         <h1 className="text-3xl md:text-5xl font-bold mb-3 sm:mb-8 gradient-title">
           {project.name}
         </h1>
-        <Button
-          className="mt-2 cursor-pointer"
-          onClick={() => setShowForm(!showForm)}
-          variant={!showForm ? "default" : "destructive"}
-        >
-          {!showForm ? "Create New Sprint" : "Cancel"}
-        </Button>
+        {!showForm && (
+          <Button
+            className="mt-2 cursor-pointer"
+            onClick={() => setShowForm(!showForm)}
+          >
+            Create New Sprint
+          </Button>
+        )}
       </div>
       {showForm && (
-        <Card className="pt-4 mb-4 sm:max-w-150 m-auto">
+        <Card className="pt-4 sm:max-w-200 mx-auto mb-4">
           <CardContent>
             <form
-              className="flex gap-4 items-end"
+              className="flex flex-col sm:flex-row gap-4 items-center sm:items-end"
               onSubmit={handleSubmit(onSubmit)}
             >
               <div className="flex-1">
@@ -155,6 +156,15 @@ const CreateSprintForm = ({
 
               <Button type="submit" className="cursor-pointer">
                 {isLoading ? "Creating Sprint..." : "Create Sprint"}
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => setShowForm(!showForm)}
+              >
+                Cancel
               </Button>
             </form>
           </CardContent>

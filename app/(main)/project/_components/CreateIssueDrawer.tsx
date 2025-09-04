@@ -27,7 +27,6 @@ import { Controller, useForm } from "react-hook-form";
 import { BarLoader } from "react-spinners";
 import { IssuePriority } from "@/app/constants";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 
 type params = {
@@ -80,7 +79,6 @@ const CreateIssueDrawer = ({
   }, [createdIssueData, isCreateIssueLoading]);
 
   const onSubmit = async (data: IssueFormData) => {
-    console.log("====data====", data);
     await actionCreateIssue(projectId, {
       ...data,
       status,
@@ -96,6 +94,9 @@ const CreateIssueDrawer = ({
     formState: { errors },
   } = useForm({
     resolver: zodResolver(IssueSchema),
+    defaultValues: {
+      description: "",
+    },
   });
 
   return (
@@ -174,6 +175,11 @@ const CreateIssueDrawer = ({
                 />
               )}
             />
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.description.message}
+              </p>
+            )}
           </div>
           <div>
             <label
@@ -204,6 +210,11 @@ const CreateIssueDrawer = ({
                 </Select>
               )}
             />
+            {errors.priority && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.priority.message}
+              </p>
+            )}
           </div>
 
           {createIssueError && (

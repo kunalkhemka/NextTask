@@ -16,6 +16,7 @@ const useFetch = (cb: Function) => {
       const response = await cb(...args);
       setData(response);
       setError(null);
+      return response;
     } catch (error: any) {
       setData(null);
       setError(error);
@@ -25,7 +26,7 @@ const useFetch = (cb: Function) => {
     }
   };
 
-  return { data, isLoading, error, fn, setData };
+  return { data, isLoading, error, fn };
 };
 
 export default useFetch;

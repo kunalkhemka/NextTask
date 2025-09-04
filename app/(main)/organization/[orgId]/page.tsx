@@ -2,6 +2,8 @@ import { getCurrentOrganization } from "@/actions/organization";
 import OrgSwitcher from "@/app/(main)/organization/_components/OrganizationSwitcher";
 import ProjectsList from "@/app/(main)/organization/_components/ProjectsList";
 import React from "react";
+import UserIssues from "../_components/UserIssues";
+import { auth } from "@clerk/nextjs/server";
 
 interface OrganizationParams {
   params: {
@@ -12,6 +14,7 @@ interface OrganizationParams {
 const Organization: React.FC<OrganizationParams> = async ({ params }) => {
   const { orgId } = await params;
   const organization = await getCurrentOrganization(orgId);
+  const { userId } = await auth();
 
   if (!organization) {
     return <div>Organization not found or you do not have access.</div>;
@@ -25,9 +28,14 @@ const Organization: React.FC<OrganizationParams> = async ({ params }) => {
         </h1>
         <OrgSwitcher />
       </div>
-      <div className="mb-4"></div>
-      <ProjectsList />
-      <div className="mt-8"></div>
+      <div className="mb-4">
+        <ProjectsList />
+      </div>
+      {userId && (
+        <div className="mt-8">
+          <UserIssues userId={userId} />
+        </div>
+      )}
     </div>
   );
 };

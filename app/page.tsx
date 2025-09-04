@@ -45,7 +45,7 @@ export default function Home() {
         <p className="text-xl text-gray-700 mb-10 max-w-3xl mx-auto">
           Empower your team with our intuitive project management solution.
         </p>
-        <Link href="/onboarding">
+        <Link href="/">
           <Button size="lg" className="mr-4">
             Get Started <ChevronRight className="ml-1" size={18} />
           </Button>
@@ -87,7 +87,7 @@ export default function Home() {
             Join thousands of teams already using NextTask to streamline your
             projects and boost productivity.
           </p>
-          <Link href="/onboarding">
+          <Link href="/">
             <Button size="lg" className="animate-bounce">
               Start For Free <ArrowRight className="ml-2 h-5 w-5" />
             </Button>

@@ -28,9 +28,9 @@ export const SprintSchema = z.object({
 export type SprintFormData = z.infer<typeof SprintSchema>;
 
 export const IssueSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  title: z.string().trim().min(1, "Title is required"),
   assigneeId: z.cuid("Please select assignee"),
-  description: z.string().optional(),
-  priority: z.enum(IssuePriority),
+  description: z.string().trim().min(1, "Description is required"),
+  priority: z.enum(IssuePriority, { message: "Please select Priority" }),
 });
 export type IssueFormData = z.infer<typeof IssueSchema>;

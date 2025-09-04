@@ -1,17 +1,24 @@
 "use client";
 
-import { ProjectWithSprints } from "@/app/types";
-import { IssueStatus, SprintStatus } from "@/lib/generated/prisma";
+import { IssueWithAssigneeReporter, ProjectWithSprints } from "@/app/types";
+import { Issue, IssueStatus, SprintStatus } from "@/lib/generated/prisma";
 import { useEffect, useState } from "react";
 import SprintManager from "./SprintManager";
-import { DragDropContext, Droppable } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from "@hello-pangea/dnd";
 import { IssueStatuses, IssueStatusesType } from "@/app/constants";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import CreateIssueDrawer from "./CreateIssueDrawer";
 import useFetch from "@/app/hooks/useFetch";
-import { getIssuesForSprint } from "@/actions/issues";
+import { getIssuesForSprint, updateIssueOrder } from "@/actions/issues";
 import { BarLoader } from "react-spinners";
+import IssueCard from "./IssueCard";
+import { toast } from "sonner";
 
 const SprintBoard = ({
   project,
@@ -31,34 +38,104 @@ const SprintBoard = ({
   );
 
   const {
-    data: issues,
-    setData: setIssues,
-    error: getIssuesError,
+    error: issuesError,
     isLoading: isIssuesLoading,
     fn: actionGetIssuesForSprint,
   } = useFetch(getIssuesForSprint);
 
+  const {
+    fn: actionUpdateIssueOrder,
+    isLoading: isIssueUpdating,
+    error: issueUpdateError,
+  } = useFetch(updateIssueOrder);
+
+  const [issuesData, setIssuesData] =
+    useState<Array<IssueWithAssigneeReporter>>();
+
   useEffect(() => {
     if (currentSprint.id) {
-      actionGetIssuesForSprint(currentSprint.id);
+      (async () => {
+        const issues = await actionGetIssuesForSprint(currentSprint.id);
+        setIssuesData(issues as IssueWithAssigneeReporter[]);
+      })();
     }
   }, [currentSprint.id]);
 
-  const onDragEnd = () => {};
+  useEffect(() => {
+    if (issueUpdateError) {
+      toast.error(issueUpdateError.message);
+    }
+  }, [issueUpdateError]);
+
+  const onDragEnd = async (result: DropResult<string>) => {
+    console.log("===========drag end=========");
+    if (currentSprint.status === SprintStatus.PLANNED) {
+      toast.warning("Start the sprint to update the board");
+      return;
+    }
+    if (currentSprint.status === SprintStatus.COMPLETED) {
+      toast.warning("Start the sprint to update the board");
+      return;
+    }
+
+    const { destination, source } = result;
+
+    if (
+      (destination?.droppableId === source.droppableId &&
+        destination?.index === source.index) ||
+      !issuesData ||
+      !destination
+    ) {
+      return;
+    }
+
+    const newOrderedData = [...issuesData];
+
+    const sourceList = newOrderedData.filter(
+      (issue) => issue.status === source.droppableId
+    );
+
+    //If card is dragged and dropped in the same column i.e. re-ordered
+    if (source.droppableId === destination.droppableId) {
+      const [removed] = sourceList.splice(source.index, 1);
+      sourceList.splice(destination.index, 0, removed);
+
+      sourceList.forEach((card, i) => (card.order = i));
+    } else {
+      const destinationList = newOrderedData.filter(
+        (issue) => issue.status === destination.droppableId
+      );
+
+      const [removed] = sourceList.splice(source.index, 1);
+      removed.status = destination.droppableId as IssueStatus;
+      destinationList.splice(destination.index, 0, removed);
+
+      sourceList.forEach((card, i) => (card.order = i));
+      destinationList.forEach((card, i) => (card.order = i));
+    }
+
+    const sortedIssues = newOrderedData.sort((a, b) => a.order - b.order);
+    setIssuesData(sortedIssues);
+    actionUpdateIssueOrder(sortedIssues);
+  };
 
   const handleAddIssue = (status: IssueStatusesType) => {
     setSelectedStatus(status.key);
     setIsDrawerOpen(true);
   };
 
-  const handleIssueCreated = () => {};
+  const fetchIssues = async () => {
+    setIssuesData(undefined);
+    const issues = await actionGetIssuesForSprint(currentSprint.id);
+    setIssuesData(issues as IssueWithAssigneeReporter[]);
+  };
 
-  if (getIssuesError) {
+  if (issuesError) {
     return <div>Error loading Issues</div>;
   }
 
   return (
-    <div>
+    <div className="flex flex-col">
       <SprintManager
         sprint={currentSprint}
         setSprint={setCurrentSprint}
@@ -66,7 +143,7 @@ const SprintBoard = ({
         projectId={project.id}
       />
 
-      {isIssuesLoading && (
+      {(isIssueUpdating || isIssuesLoading) && (
         <BarLoader className="mt-4" width={"100%"} />
       )}
 
@@ -84,7 +161,40 @@ const SprintBoard = ({
                     {status.name}
                   </h3>
 
-                  {/* Issues */}
+                  {issuesData
+                    ?.filter((issue) => issue.status === status.key)
+                    .map((issue, index) => (
+                      <Draggable
+                        key={issue.id}
+                        draggableId={issue.id}
+                        isDragDisabled={isIssueUpdating as boolean}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <IssueCard
+                              issue={issue}
+                              onDelete={fetchIssues}
+                              onUpdate={(updatedIssueData) => {
+                                setIssuesData((issues) => {
+                                  return issues?.map((issue) => {
+                                    if (issue.id === updatedIssueData.id) {
+                                      return updatedIssueData;
+                                    }
+                                    return issue;
+                                  });
+                                });
+                              }}
+                              showStatus={false}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
 
                   {provided.placeholder}
                   {status.key === IssueStatus.TODO &&
@@ -107,7 +217,7 @@ const SprintBoard = ({
       <CreateIssueDrawer
         isOpen={isDrawerOpen}
         setIsDrawerOpen={(open) => setIsDrawerOpen(open)}
-        onIssueCreated={handleIssueCreated}
+        onIssueCreated={fetchIssues}
         sprintId={currentSprint.id}
         status={selectedStatus}
         orgId={orgId}

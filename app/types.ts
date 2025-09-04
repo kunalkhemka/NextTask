@@ -1,4 +1,4 @@
-import { Prisma, Project, Sprint, User } from "@/lib/generated/prisma";
+import { Issue, Prisma, Project, Sprint, User } from "@/lib/generated/prisma";
 
 export type ProjectWithSprints = Prisma.ProjectGetPayload<{
   include: { sprints: true };
@@ -20,6 +20,8 @@ export type ApiResponse =
   | Project
   | Sprint
   | User[]
+  | Issue[]
   | IssueWithAssigneeReporter
+  | IssueWithAssigneeReporter[]
   | SuccessResponse
   | null;
