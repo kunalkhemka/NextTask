@@ -35,7 +35,7 @@ export default function Home() {
           <span className="flex mx-auto gap-3 sm:gap-4 items-center-safe">
             <span className="pt-1.5">with </span>
             <Image
-              src="/updated.png"
+              src="/logo.png"
               alt="NextTask Logo"
               width={400}
               height={100}

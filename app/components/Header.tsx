@@ -20,7 +20,7 @@ const Header = async () => {
         <Link href="/">
           <h1 className="text-2xl font-bold">
             <Image
-              src={"/updated.png"}
+              src={"/logo.png"}
               alt="NextTask Logo"
               width={200}
               height={56}
