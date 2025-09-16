@@ -68,7 +68,6 @@ const SprintBoard = ({
   }, [issueUpdateError]);
 
   const onDragEnd = async (result: DropResult<string>) => {
-    console.log("===========drag end=========");
     if (currentSprint.status === SprintStatus.PLANNED) {
       toast.warning("Start the sprint to update the board");
       return;

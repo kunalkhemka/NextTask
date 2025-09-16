@@ -20,7 +20,7 @@ import { BarLoader } from "react-spinners";
 
 type params = {
   sprint: Sprint;
-  setSprint: Function;
+  setSprint: (sprint: Sprint) => void;
   sprints: Sprint[];
   projectId: string;
 };

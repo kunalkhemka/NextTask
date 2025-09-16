@@ -2,9 +2,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ApiResponse } from "@/app/types";
 
-const useFetch = (cb: Function) => {
+const useFetch = (cb: (...args: any[]) => Promise<ApiResponse>) => {
   const [data, setData] = useState<ApiResponse>(null);
-  const [isLoading, setIsLoading] = useState<Boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
   const fn = async (...args: any[]) => {
@@ -17,10 +17,12 @@ const useFetch = (cb: Function) => {
       setData(response);
       setError(null);
       return response;
-    } catch (error: any) {
+    } catch (error) {
       setData(null);
-      setError(error);
-      toast.error(error?.message);
+      if (error instanceof Error) {
+        setError(error);
+        toast.error(error?.message);
+      }
     } finally {
       setIsLoading(false);
     }

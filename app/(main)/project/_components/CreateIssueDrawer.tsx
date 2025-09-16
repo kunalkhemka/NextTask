@@ -35,7 +35,7 @@ type params = {
   sprintId: string;
   status: IssueStatus | null;
   projectId: string;
-  onIssueCreated: Function;
+  onIssueCreated: () => void;
   orgId: string;
 };
 
