@@ -4,7 +4,9 @@ import React from "react";
 import CreateSprintForm from "../_components/CreateSprintForm";
 import SprintBoard from "../_components/SprintBoard";
 
-const ProjectPage = async ({ params }: { params: { projectId: string } }) => {
+type ProjectParams = Promise<{ projectId: string }>;
+
+const ProjectPage = async ({ params }: { params: ProjectParams }) => {
   const { projectId } = await params;
   const project = await fetchProjectById(projectId);
 

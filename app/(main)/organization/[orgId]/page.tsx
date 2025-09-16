@@ -5,13 +5,9 @@ import React from "react";
 import UserIssues from "../_components/UserIssues";
 import { auth } from "@clerk/nextjs/server";
 
-interface OrganizationParams {
-  params: {
-    orgId: string;
-  };
-}
+type OrganizationParams = Promise<{ orgId: string }>;
 
-const Organization: React.FC<OrganizationParams> = async ({ params }) => {
+const Organization = async ({ params }: { params: OrganizationParams }) => {
   const { orgId } = await params;
   const organization = await getCurrentOrganization(orgId);
   const { userId } = await auth();
